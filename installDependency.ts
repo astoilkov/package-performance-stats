@@ -1,32 +1,34 @@
-import { join } from "https://deno.land/std/path/mod.ts";
+import { join } from 'path'
+import { tmpdir } from 'os'
+import { promises } from 'fs'
+import simpleSpawn from 'simple-spawn'
+import { getRandomPath } from 'get-file-name'
 
-/**
- *
- * @param dependencyName
- * @returns folder path where the dependency have been installed
- */
-export default async function installDependency(dependencyName: string, version?: string): Promise<string> {
-    const installDir = await Deno.makeTempDir()
+export default async function installDependency(
+  dependencyName: string,
+  version?: string,
+): Promise<string> {
+  const uniqueFolderPath = getRandomPath(tmpdir())
 
-    await Deno.writeTextFile(join(installDir, 'package.json'), packageJsonContents)
+  await promises.mkdir(uniqueFolderPath)
 
-    const result = await Deno.run({
-        cwd: installDir,
-        stdout: 'piped',
-        stderr: 'piped',
-        cmd: ['yarn', 'add', `${dependencyName}${version === undefined ? '' : `@${version}`}`]
-    })
+  await promises.writeFile(join(uniqueFolderPath, 'package.json'), packageJsonContents)
 
-    // it seems this actually waits for the process to finish
-    await result.status()
+  await simpleSpawn(
+    'npm',
+    ['install', version === undefined ? dependencyName : `${dependencyName}@${version}`],
+    {
+      cwd: uniqueFolderPath,
+    },
+  )
 
-    return join(installDir, 'node_modules', dependencyName)
+  return join(uniqueFolderPath, 'node_modules', dependencyName)
 }
 
 const packageJsonContents = `
 {
-  "name": "dummy",
-  "version": "0.1.0",
-  "private": true
+    "name": "dummy",
+    "version": "0.1.0",
+    "private": true
 }
 `

@@ -1,0 +1,71 @@
+{
+  "compilerOptions": {
+    "jsx": "react",
+
+    "module": "CommonJS",
+
+    // From what I understand reading the docs "classic" was introduced first and "classic" is by default(except when
+    // "module": "commonjs") because of backwards compatibility.
+    //
+    // From the docs: "node module resolution is the most-commonly used in the TypeScript community and is recommended
+    // for most projects."
+    "moduleResolution": "node",
+
+    // Changed from "ES2020" to "ES2019" when updating between TypeScript 3.7 to 3.8 because webpack
+    // build was throwing an error which was caused by this issue:
+    // https://github.com/TypeStrong/ts-loader/issues/1061.
+    "target": "ES2019",
+
+    // 🐛 This fixes auto importing of local_modules. Without this TypeScript will import it like
+    // `../../local_modules/path-fix` instead of `path-fix`. Tried using
+    // `"paths": { "*": ["*", "./app/local_modules"] }` but WebStorm didn't work with it(specifically relative imports
+    // in parent folders).
+    "baseUrl": "./local_modules",
+
+    // Allows modules which were exported using `module.exports` or `export = ` to be imported using
+    // `import module from 'module'`.
+    // - 😡 adds `__importDefault()` helper (not sure about this)
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+
+    // Enable all strict type checking options. Enabling `strict` enables:
+    // - noImplicitAny
+    // - noImplicitThis
+    // - alwaysStrict
+    // - strictBindCallApply
+    // - strictNullChecks
+    // - strictFunctionTypes
+    // - strictPropertyInitialization
+    "strict": true,
+
+    // Unused function parameters are reported as warnings.
+    //
+    // Use underscore in front of a variable to disable the error. Example: (_e, value)
+    "noUnusedParameters": true,
+
+    "noUnusedLocals": true,
+    "allowUnreachableCode": false,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+
+    // - ℹ️ https://www.typescriptlang.org/tsconfig#isolatedModules
+    // - 😃 Deno requires "isolatedModules" to be set to `true`
+    // - 😃 the stricter version - I always prefer the stricter version
+    // - 😃 probably the future
+    "isolatedModules": true,
+
+//    "typeRoots": ["node_modules/@types"]
+
+    // #experiment
+    // When you do `keyof T` instead of returning `string | number` it returns only `string` when
+    // the object is `{ [key: string ]: any }`.
+    //
+    // Removed because `keyof { [key: number]: any }` returns never.
+    // "keyofStringsOnly": true
+
+    // Disabled because it has bugs which prevents the app from starting.
+    // "useDefineForClassFields": true,
+  },
+
+  "include": ["index.ts"],
+}
