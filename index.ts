@@ -1,4 +1,4 @@
-import buildDependency from './buildDependency'
+import bundleDependency from './bundleDependency'
 import installDependency from './installDependency'
 import prettyBytes from 'pretty-bytes'
 import { statSync } from 'fs'
@@ -9,7 +9,7 @@ import getBoilerplateSize from './getBoilerplateSize'
     console.log(prettyBytes(await getBoilerplateSize()))
     const dependencyDirPath = await installDependency('use-local-storage-state', '7.0.0')
     simpleSpawn('code', [dependencyDirPath])
-    const outputPath = await buildDependency(dependencyDirPath, 'default')
+    const outputPath = await bundleDependency(dependencyDirPath, 'default')
     console.log(prettyBytes(statSync(outputPath).size))
   } catch (err) {
     throw err

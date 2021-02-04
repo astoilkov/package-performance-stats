@@ -13,13 +13,17 @@ export default async function getBoilerplateSize(): Promise<number> {
 
   await promises.mkdir(uniqueFolderPath)
 
-  await promises.writeFile(entryPath, 'export default 3')
+  await promises.writeFile(
+    entryPath,
+    `import dummyExternalPackage from 'dummy-external-package'\nexport default dummyExternalPackage`,
+  )
 
   await build({
     minify: true,
     bundle: true,
     outfile: outputPath,
     entryPoints: [entryPath],
+    external: ['dummy-external-package'],
   })
 
   simpleSpawn('code', [uniqueFolderPath])

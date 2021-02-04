@@ -2,8 +2,9 @@ import { join } from 'path'
 import { promises } from 'fs'
 import { build } from 'esbuild'
 import { LiteralUnion } from 'type-fest'
+import { readFile } from 'fs/promises'
 
-export default async function buildDependency(
+export default async function bundleDependency(
   dependencyDirPath: string,
   importStatement: LiteralUnion<'default', string>,
 ): Promise<string> {
@@ -20,12 +21,16 @@ export default async function buildDependency(
 
   await build({
     bundle: true,
-    minify: true,
+    // minify: true,
     outfile: outputPath,
     entryPoints: [entryFilePath],
     define: {
       NODE_ENV: 'production',
     },
+    external: Object.keys(
+      JSON.parse(await readFile(join(dependencyDirPath, 'package.json'), { encoding: 'utf-8' }))
+        .peerDependencies,
+    ),
   })
 
   return outputPath
