@@ -1,16 +1,20 @@
 import bundleDependency from './bundleDependency'
 import installDependency from './installDependency'
 import prettyBytes from 'pretty-bytes'
-import { statSync } from 'fs'
 import simpleSpawn from 'simple-spawn'
-import getBoilerplateSize from './getBoilerplateSize'
+import { join } from 'path'
 ;(async () => {
   try {
-    console.log(prettyBytes(await getBoilerplateSize()))
-    const dependencyDirPath = await installDependency('use-local-storage-state', '7.0.0')
+    const dependencyDirPath = await installDependency('use-local-storage-state')
     simpleSpawn('code', [dependencyDirPath])
-    const outputPath = await bundleDependency(dependencyDirPath, 'default')
-    console.log(prettyBytes(statSync(outputPath).size))
+    const bundleResult = await bundleDependency(
+      dependencyDirPath,
+      join(dependencyDirPath, 'es/index.js'),
+      'default',
+    )
+    console.log(prettyBytes(bundleResult.cjsSize))
+    console.log(prettyBytes(bundleResult.esmSize))
+    console.log(prettyBytes(bundleResult.iifeSize))
   } catch (err) {
     throw err
   }
